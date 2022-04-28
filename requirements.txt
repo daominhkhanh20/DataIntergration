@@ -1,0 +1,5 @@
+scrapy~=2.6.1
+pymongo[srv]
+itemadapter~=0.5.0
+requests~=2.27.1
+tqdm
