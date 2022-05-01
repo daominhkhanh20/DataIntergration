@@ -12,8 +12,9 @@ cellphones_collections = database['cellphones']
 
 class CellPhoneS(Spider):
     name = 'cellphones'
-    list_phone_url = json.load(open('../Url/cellphones/phone.json', 'r'))
-    list_laptop_url = json.load(open('../Url/cellphones/laptop.json', 'r'))
+    list_phone_url = json.load(open('Url/cellphones/phone.json', 'r'))
+    list_laptop_url = []
+    #list_laptop_url = json.load(open('Url/cellphones/laptop.json', 'r'))
 
     def start_requests(self):
         for url in self.list_phone_url + self.list_laptop_url:
