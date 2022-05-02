@@ -1,7 +1,5 @@
 .idea
 venv
-*.ipynb
-*.json
 Crawl/driver
 Crawl/run.sh
 Crawl/Crawl/__pycache__
