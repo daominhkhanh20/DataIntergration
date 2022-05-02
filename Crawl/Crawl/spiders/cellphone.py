@@ -12,8 +12,8 @@ cellphones_collections = database['cellphones']
 
 class CellPhoneS(Spider):
     name = 'cellphones'
-    list_phone_url = json.load(open('Url/cellphones/final_phone.json', 'r'))
-    list_laptop_url = json.load(open('Url/cellphones/final_laptop.json', 'r'))
+    list_phone_url = json.load(open('Url/cellphones/remain_phone.json', 'r'))
+    list_laptop_url = json.load(open('Url/cellphones/remain_laptop.json', 'r'))
     list_phone_url_copy = list_phone_url.copy()
     list_laptop_url_copy = list_laptop_url.copy()
 
