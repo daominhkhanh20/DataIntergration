@@ -34,4 +34,4 @@ def get_url_item(url: str, max_page: int, file_name: str):
 
 
 get_url_item(url_phone, max_page=200, file_name='Crawl/Url/cellphones/phone.json')
-get_url_item(url_laptop, max_page=200, file_name='fCrawl/Url/cellphones/laptop.json')
+get_url_item(url_laptop, max_page=200, file_name='Crawl/Url/cellphones/laptop.json')
