@@ -12,8 +12,8 @@ tgdd_collections = database['tgdd']
 
 class Tgdd(Spider):
     name = 'tgdd'
-    list_phone_url = json.load(open('Url/tgdd/phone.json', 'r'))
-    list_laptop_url = json.load(open('Url/tgdd/laptop.json', 'r'))
+    list_phone_url = json.load(open('../Url/tgdd/phone.json', 'r'))
+    list_laptop_url = json.load(open('../Url/tgdd/laptop.json', 'r'))
 
     def start_requests(self):
         for url in self.list_phone_url:
@@ -36,5 +36,5 @@ class Tgdd(Spider):
             'salient characteristic': [text.strip() for text in response.xpath('//div[@class="content-article"]/p').css('*:not(style)::text').extract() if text.strip()]
         }
         print(data)
-        tgdd_collections.insert_one(data)
+        #tgdd_collections.insert_one(data)
 
