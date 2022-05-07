@@ -15,8 +15,8 @@ database = client['DataIntegration']
 
 pv_collections = database['phongvu']
 
-list_laptop_url = json.load(open('phongvu_laptop_url.json', 'r'))
-list_phone_url = json.load(open('phongvu_phone_url.json', 'r'))
+list_laptop_url = json.load(open('Url/phongvu/phongvu_laptop_url.json', 'r'))
+list_phone_url = json.load(open('Url/phongvu/phongvu_phone_url.json', 'r'))
 
 def convert(list_url):
     list_product_id = []
