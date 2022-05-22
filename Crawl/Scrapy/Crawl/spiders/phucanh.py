@@ -35,11 +35,11 @@ class Phucanh(Spider):
                             'url': detail_url
                         }
 
-                        yield item
+                        #yield item
 
-                        #request = Request(response.urljoin(detail_url), callback=self.parse_content)
-                        #request.meta['item'] = item
-                        #yield request
+                        request = Request(response.urljoin(detail_url), callback=self.parse_content)
+                        request.meta['item'] = item
+                        yield request
                         
         
         def parse_content(self, response):
@@ -50,7 +50,7 @@ class Phucanh(Spider):
             item['device_detail_info'] =   response.xpath('//div[@class="tbl-technical nd"]/table/tbody/tr/td/text()').getall()
             
 
-            return item
+            #return item
             pa_collections.insert_one(item)
             # yield item
 
