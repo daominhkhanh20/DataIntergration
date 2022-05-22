@@ -13,3 +13,6 @@ scrapy crawl phongvu -O ../Url/phongvu/phongvu_laptop_url.json -a device=laptop
 
 cd ../api
 python phongvu_extract.py
+
+#crawl phucanh
+scrapy crawl phucanh
