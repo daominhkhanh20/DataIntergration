@@ -10,6 +10,7 @@ scrapy crawl tgdd
 
 scrapy crawl phongvu -O ../Url/phongvu/phongvu_phone_url.json -a device=phone
 scrapy crawl phongvu -O ../Url/phongvu/phongvu_laptop_url.json -a device=laptop
+scrapy crawl anphat
 
 cd ../api
 python phongvu_extract.py
