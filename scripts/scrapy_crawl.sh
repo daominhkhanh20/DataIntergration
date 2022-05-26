@@ -17,3 +17,5 @@ python phongvu_extract.py
 
 #crawl phucanh
 scrapy crawl phucanh
+#crawl laptopworld
+scrapy crawl laptopworld
