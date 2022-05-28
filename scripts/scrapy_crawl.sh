@@ -19,3 +19,6 @@ python phongvu_extract.py
 scrapy crawl phucanh
 #crawl laptopworld
 scrapy crawl laptopworld
+
+#crawl nguyenkim
+scrapy crawl nguyenkim
