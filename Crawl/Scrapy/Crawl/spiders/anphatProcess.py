@@ -5,12 +5,12 @@ import pandas as pd
 client = MongoClient(
     "mongodb+srv://dataintergration:nhom10@cluster0.hqw7c.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 
-database = client['DataIntegration']
+database = client['ProcessData']
 
-ap_collections = database['ProcessData']
+ap_collections = database['anphat']
 
 class AnPhat(Spider):
-    name = 'anphat2'
+    name = 'anphatprocess'
 
     def start_requests(self):
         # device = getattr(self, 'device', None)
@@ -40,8 +40,10 @@ class AnPhat(Spider):
         data.drop(index=data[data[0] == data[1]].index,inplace=True)
         list_type = ['Tên sản phẩm','Hệ điều hành\xa0(bản quyền) đi kèm','Dung lượng','Bộ vi xử lý','Card màn hình','Dung lượng','Trọng Lượng','Xuất xứ','Hãng sản xuất','Màu sắc','Kiểu Pin']
         dict_tmp = {'Tên sản phẩm':'product_name','Hệ điều hành\xa0(bản quyền) đi kèm':'os','Bộ vi xử lý':'cpu','Card màn hình':'gpu','Trọng Lượng':'weight','Xuất xứ':'origin','Hãng sản xuất':'brand','Màu sắc':'color','Kiểu Pin':'pin'}
+        
         dict_loader = {}
-        for x in dict_tmp.values():
+        list_need = ['product_name', 'os','ram', 'cpu','cpu speed' ,'gpu', 'screen','screen resolution','storage','weight', 'origin', 'brand', 'color', 'pin']
+        for x in list_need:
             dict_loader[x] = ''
 
         for id, item in data.iterrows():
@@ -53,6 +55,13 @@ class AnPhat(Spider):
                 dict_loader['cpu'] = item[1]
             elif item[0] == 'Xuất Xứ':
                 dict_loader['origin'] = item[1]
+            elif  item[0] in ['Tốc độ','Tốc độ CPU']:
+                dict_loader['cpu speed'] = item[1]
+            elif item[0] in ['Công nghệ màn hình','Màn hình']:
+                dict_loader['screen'] = item[1]
+            elif item[0] in ['Độ phân giải']:
+                dict_loader['screen resolution'] = item[1]
+            
             elif item[0] in list_type:
                 dict_loader[dict_tmp[item[0]]] = item[1]
         return dict_loader
@@ -60,7 +69,6 @@ class AnPhat(Spider):
         item = response.meta['item']
         item['image_url'] = response.xpath('//span[@class="img"]/img[@class="fit-img"]/@src').get()
         item['price'] = response.xpath('//b[@class="text-18 js-pro-total-price"]/@data-price').get()
-        item['web'] = 'anphat'
         item.update(self.getData(item))
 
         ap_collections.insert_one(item)
