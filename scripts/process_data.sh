@@ -1,3 +1,3 @@
 # processing anphat
 cd Crawl/Scrapy
-scrapy crawl anphat2
+scrapy crawl anphatprocess
