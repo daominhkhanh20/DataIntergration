@@ -54,11 +54,11 @@ class AnPhat(Spider):
 
         return dict_loader
 
-        
     def parse_content(self, response):
         try:
             item = response.meta['item']
             item['image_url'] = response.xpath('//div[@class="img-item"]//img/@src').get()
+            item['product_name'] = response.xpath(' //div[@class="product_detail-title"]/h1/text()').get()
             price = response.xpath('//span[@class="gia-km-cu"]/text()').get()
             if type(price) == str:
                 price = price.replace('₫','').replace('.','')
