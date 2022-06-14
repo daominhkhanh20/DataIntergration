@@ -41,12 +41,12 @@ class CellPhoneS(Spider):
             'more_offer': response.xpath('//*[@class="item-promotion"]/a/text()').getall(),
             'salient characteristic': response.xpath('//*[@style="text-align: justify;"]/text()').getall()
         }
-        # cellphones_collections.insert_one(data)
-        # if response.meta.get('device', None) == 'phone':
-        #     self.list_phone_url_copy.remove(response.url)
-        #
-        # elif response.meta.get('device', None) == 'laptop':
-        #     self.list_laptop_url_copy.remove(response.url)
+        cellphones_collections.insert_one(data)
+        if response.meta.get('device', None) == 'phone':
+            self.list_phone_url_copy.remove(response.url)
+        
+        elif response.meta.get('device', None) == 'laptop':
+            self.list_laptop_url_copy.remove(response.url)
 
     def save_json(self, path: str, data: list):
         with open(path, 'w') as file:
