@@ -40,10 +40,35 @@ def parser(sent):
 
 
 def process_df(data: DataFrame):
+
     for idx, row in tqdm(data.iterrows(), total=len(data)):
         if pd.isnull(data.loc[idx, 'product_name']) is False:
+            if 'macbook' in row['product_name'].lower():
+                data.loc[idx, 'Hãng sản xuất'] = 'apple'
+            elif 'dell' in row['product_name'].lower():
+                data.loc[idx, 'Hãng sản xuất'] = 'dell'
+            elif 'hp' in row['product_name'].lower():
+                data.loc[idx, 'Hãng sản xuất'] = 'hp'
+            elif 'microsoft' in row['product_name'].lower():
+                data.loc[idx, 'Hãng sản xuất'] = 'microsoft'
+            elif 'msi' in row['product_name'].lower():
+                data.loc[idx, 'Hãng sản xuất'] = 'msi'
+            elif 'lg' in row['product_name'].lower():
+                data.loc[idx, 'Hãng sản xuất'] = 'lg'
+            elif 'acer' in row['product_name'].lower():
+                data.loc[idx, 'Hãng sản xuất'] = 'acer'
+            elif 'asus' in row['product_name'].lower():
+                data.loc[idx, 'Hãng sản xuất'] = 'asus'
+            elif 'lenovo' in row['product_name'].lower():
+                data.loc[idx, 'Hãng sản xuất'] = 'lenovo'
+            elif 'gigabyte' in row['product_name'].lower():
+                data.loc[idx, 'Hãng sản xuất'] = 'gigabyte'
+            else:
+                print(row['product_name'])
+
             product_name = row['product_name']
             product_name, detail = parser(product_name)
+            data.loc[idx, 'product_name'] = product_name
             if detail is not None and len(detail) >= 7:
                 data.loc[idx, 'Bộ vi xử lý'] = detail[0]
                 data.loc[idx, 'ram'] = detail[1]
@@ -81,7 +106,9 @@ class MatchingData:
             documents.append(doc)
         documents = pd.DataFrame(documents)
         documents = process_df(documents)
-        documents.to_csv('temp.csv', index=False)
+        documents = documents[documents['Hãng sản xuất'].notna()].reset_index(drop=True)
+        documents[['Hệ điều hành', 'web', 'Bộ vi xử lý', 'Hãng sản xuất', 'Pin', 'product_name', 'VGA', 'price',
+                   'Bộ nhớ trong', 'Ổ cứng', 'Màn hình', 'Mầu sắc', 'ram']].to_csv('temp.csv', index=False)
         websites = list(set(documents['web'].values.tolist()))
         df = []
         for website in websites:
@@ -96,14 +123,20 @@ class MatchingData:
         df = self.df[index]
         df1 = self.df[index1]
         indexer = recordlinkage.Index()
-        indexer.full()
+        indexer.block('Hãng sản xuất')
         candidates = indexer.index(df, df1)
 
         compare = recordlinkage.Compare()
-        list_feature = ['product_name', 'Bộ nhớ trong', 'ram', 'Bộ vi xử lý']
-        list_threshold = [0.8, 0.6, 0.8, 0.8]
-        for idx, feature in enumerate(list_feature):
-            compare.string(feature, feature, threshold=list_threshold[idx], label=feature)
+        list_keys = {
+            'product_name': 0.75,
+            'Bộ nhớ trong': 0.6,
+            'ram': 0.8,
+            'Bộ vi xử lý': 0.8
+        }
+        # list_feature = ['product_name', 'Bộ nhớ trong', 'ram', 'Bộ vi xử lý']
+        # list_threshold = [0.8, 0.6, 0.8, 0.8]
+        for feature, threshold in list_keys.items():
+            compare.string(feature, feature, threshold=threshold, label=feature)
         # compare.string('product_name', 'product_name', threshold=0.8, label='product_name')
         # compare.string('Bộ nhớ trong', 'Bộ nhớ trong', threshold=0.8, label='Bộ nhớ trong')
         # compare.string('ram', 'ram', threshold=0.7, label='ram')
@@ -111,7 +144,7 @@ class MatchingData:
         features = compare.compute(candidates, df, df1)
         index_accept = []
         for idx, row in features.iterrows():
-            if any(row[feature] == 0 for feature in list_feature):
+            if any(row[feature] == 0 for feature in list_keys.keys()):
                 continue
             index_accept.append(idx)
         potential_features = features[features.index.isin(index_accept)].reset_index()
@@ -120,7 +153,6 @@ class MatchingData:
             for idx, row in potential_features.iterrows():
                 id1 = df.loc[row[0]]['_id']
                 id2 = df1.loc[row[1]]['_id']
-
                 if id1 in self.id2group:
                     self.id2group[id2] = self.id2group[id1]
                     self.group2id[self.id2group[id2]].append(id2)
@@ -150,15 +182,15 @@ class MatchingData:
             }
             list_shop = []
             for doc in docs:
-                detail = {
-                    'price': doc['price'],
-                    'product_url': doc['product_url'],
-                    'image_url': doc['image_url'],
-                    'product_name': doc['product_name'],
-                    'Cân nặng': data.get('Cân nặng', None),
-                    'Hãng sản xuất': data.get('Hãng sản xuất', None)
-                }
-                list_shop.append(detail)
+                # detail = {
+                #     'price': doc['price'],
+                #     'product_url': doc['product_url'],
+                #     'image_url': doc['image_url'],
+                #     'product_name': doc['product_name'],
+                #     'Cân nặng': data.get('Cân nặng', None),
+                #     'Hãng sản xuất': data.get('Hãng sản xuất', None)
+                # }
+                list_shop.append(doc)
 
             data['information'] = list_shop
             self.des_collection.insert_one(data)
