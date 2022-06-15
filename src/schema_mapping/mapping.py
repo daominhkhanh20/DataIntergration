@@ -111,7 +111,7 @@ def put_data(data):
 
 database = client['ProcessData']
 
-data_collections = database['data_mapping']
+data_collections = database['schema_mapping']
 
 max_col_match = 0
 for i in range(1,len(data)):
