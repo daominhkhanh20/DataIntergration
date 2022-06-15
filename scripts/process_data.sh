@@ -8,4 +8,3 @@ scrapy crawl hanoicmp
 scrapy crawl phucanhprocess
 # nguyenkim
 scrapy crawl nguyenkimprocess
-

@@ -120,7 +120,7 @@ class MatchingData:
             for idx, row in potential_features.iterrows():
                 id1 = df.loc[row[0]]['_id']
                 id2 = df1.loc[row[1]]['_id']
-                
+
                 if id1 in self.id2group:
                     self.id2group[id2] = self.id2group[id1]
                     self.group2id[self.id2group[id2]].append(id2)
