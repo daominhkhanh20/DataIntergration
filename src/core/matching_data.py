@@ -27,25 +27,27 @@ def parser(sent):
                 sample = sample.split('|')
             elif '/' in sent:
                 sample = sample.split('/')
-            if len(sample) > len(final_detail):
-                final_detail = sample
-
-        final_detail = [ele.strip() for ele in final_detail]
-        if len(final_detail) == 1:
-            product_name = product_name + " " + final_detail[0]
+            if isinstance(sample, list) and len(sample) > len(final_detail):
+                final_detail = sample 
+        if len(final_detail) > 0:        
+            final_detail = [ele.strip() for ele in final_detail]
+            if len(final_detail) == 1:
+                product_name = product_name + " " + final_detail[0]
+                final_detail = None
+        else:
             final_detail = None
     else:
-        final_detail = None
+        final_detail = None 
     return product_name, final_detail
 
 
 def process_df(data: DataFrame):
-
+    data['new_product_name'] = None
     for idx, row in tqdm(data.iterrows(), total=len(data)):
         if pd.isnull(data.loc[idx, 'product_name']) is False:
             if 'macbook' in row['product_name'].lower():
                 data.loc[idx, 'Hãng sản xuất'] = 'apple'
-            elif 'dell' in row['product_name'].lower():
+            elif any(brand in row['product_name'].lower() for brand in ['alienware', 'del']):
                 data.loc[idx, 'Hãng sản xuất'] = 'dell'
             elif 'hp' in row['product_name'].lower():
                 data.loc[idx, 'Hãng sản xuất'] = 'hp'
@@ -63,20 +65,32 @@ def process_df(data: DataFrame):
                 data.loc[idx, 'Hãng sản xuất'] = 'lenovo'
             elif 'gigabyte' in row['product_name'].lower():
                 data.loc[idx, 'Hãng sản xuất'] = 'gigabyte'
-            else:
-                print(row['product_name'])
+            elif 'huawei' in row['product_name'].lower():
+                data.loc[idx, 'Hãng sản xuất'] = 'huawei'
+            # else:
+            #     print(row['product_name'])
 
             product_name = row['product_name']
             product_name, detail = parser(product_name)
-            data.loc[idx, 'product_name'] = product_name
-            if detail is not None and len(detail) >= 7:
+            data.loc[idx, 'new_product_name'] = product_name
+            if detail is not None and len(detail) >= 6:
                 data.loc[idx, 'Bộ vi xử lý'] = detail[0]
                 data.loc[idx, 'ram'] = detail[1]
-                data.loc[idx, 'Bộ nhớ trong'] = detail[2]
+                data.loc[idx, 'Ổ cứng'] = detail[2]
                 data.loc[idx, 'VGA'] = detail[3]
                 data.loc[idx, 'Màn hình'] = detail[4]
                 data.loc[idx, 'Hệ điều hành'] = detail[5]
+            if detail is not None and len(detail) >= 7:
                 data.loc[idx, 'Mầu sắc'] = detail[6]
+
+        if pd.isnull(data.loc[idx, 'ram']) and pd.isnull(data.loc[idx,'Bộ nhớ trong']) is False:
+            words = re.sub('[^a-zA-Z0-9]', " ", data.loc[idx, 'Bộ nhớ trong']).strip().split(" ")
+            for word in words:
+                if 'gb' in word.lower():
+                    data.loc[idx, 'ram'] = word.lower()
+                    break
+
+    data['Bộ vi xử lý'] = data['Bộ vi xử lý'].astype(str).apply(lambda x: " ".join(re.findall('\w+', x)))
     return data
 
 
@@ -95,7 +109,7 @@ class MatchingData:
 
     @classmethod
     def init_attribute(cls, source_collection: str = 'data_mapping',
-                       des_collection: str = 'data_matching1'):
+                       des_collection: str = 'data_matching2'):
         source_collection = database[source_collection]
         des_collection = database[des_collection]
         if des_collection.count_documents(filter={}) > 0:
@@ -107,8 +121,8 @@ class MatchingData:
         documents = pd.DataFrame(documents)
         documents = process_df(documents)
         documents = documents[documents['Hãng sản xuất'].notna()].reset_index(drop=True)
-        documents[['Hệ điều hành', 'web', 'Bộ vi xử lý', 'Hãng sản xuất', 'Pin', 'product_name', 'VGA', 'price',
-                   'Bộ nhớ trong', 'Ổ cứng', 'Màn hình', 'Mầu sắc', 'ram']].to_csv('temp.csv', index=False)
+        documents[['Hệ điều hành', 'web', 'Bộ vi xử lý', 'Hãng sản xuất', 'Pin', 'product_name', 'new_product_name',
+                   'Bộ nhớ trong', 'ram', 'Ổ cứng', 'VGA', 'price','Màn hình', 'Mầu sắc']].to_csv('temp.csv', index=False)
         websites = list(set(documents['web'].values.tolist()))
         df = []
         for website in websites:
@@ -128,19 +142,13 @@ class MatchingData:
 
         compare = recordlinkage.Compare()
         list_keys = {
-            'product_name': 0.75,
-            'Bộ nhớ trong': 0.6,
+            'new_product_name': 0.8,
+            'Ổ cứng': 0.8,
             'ram': 0.8,
             'Bộ vi xử lý': 0.8
         }
-        # list_feature = ['product_name', 'Bộ nhớ trong', 'ram', 'Bộ vi xử lý']
-        # list_threshold = [0.8, 0.6, 0.8, 0.8]
         for feature, threshold in list_keys.items():
             compare.string(feature, feature, threshold=threshold, label=feature)
-        # compare.string('product_name', 'product_name', threshold=0.8, label='product_name')
-        # compare.string('Bộ nhớ trong', 'Bộ nhớ trong', threshold=0.8, label='Bộ nhớ trong')
-        # compare.string('ram', 'ram', threshold=0.7, label='ram')
-        # compare.string('Bộ vi xử lý', 'Bộ vi xử lý', threshold=0.7, label='Bộ vi xử lý')
         features = compare.compute(candidates, df, df1)
         index_accept = []
         for idx, row in features.iterrows():
@@ -182,14 +190,6 @@ class MatchingData:
             }
             list_shop = []
             for doc in docs:
-                # detail = {
-                #     'price': doc['price'],
-                #     'product_url': doc['product_url'],
-                #     'image_url': doc['image_url'],
-                #     'product_name': doc['product_name'],
-                #     'Cân nặng': data.get('Cân nặng', None),
-                #     'Hãng sản xuất': data.get('Hãng sản xuất', None)
-                # }
                 list_shop.append(doc)
 
             data['information'] = list_shop
