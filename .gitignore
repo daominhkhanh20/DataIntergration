@@ -6,3 +6,5 @@ Crawl/Crawl/__pycache__
 Crawl/Crawl/spiders/__pycache__
 temp.ipynb
 get.ipynb
+data.csv
+data/
