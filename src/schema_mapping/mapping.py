@@ -22,6 +22,8 @@ for col_name in tqdm(colections_name):
     df = []
     data_collections =  database[col_name]
     for item in data_collections.find():
+        if col_name == 'cellphones' and item['device'] =='phone':
+            continue
         item['web'] = col_name
         df.append(item)
     data[col_name] = pd.DataFrame(df)
@@ -109,7 +111,7 @@ def put_data(data):
 
 database = client['ProcessData']
 
-data_collections = database['data']
+data_collections = database['schema_mapping']
 
 max_col_match = 0
 for i in range(1,len(data)):

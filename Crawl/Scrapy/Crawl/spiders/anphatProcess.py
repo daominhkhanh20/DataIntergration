@@ -86,6 +86,7 @@ class AnPhat(Spider):
     def parse_content(self, response):
         try:
             item = response.meta['item']
+            item['product_name'] = response.xpath('//h1[@class="pro-name js-product-name"]/text()').get()
             item['image_url'] = response.xpath('//span[@class="img"]/img[@class="fit-img"]/@src').get()
             item['price'] = response.xpath('//b[@class="text-18 js-pro-total-price"]/@data-price').get()
             item.update(self.getData(item))
