@@ -1,0 +1,52 @@
+.product-info-card {
+    width: 300px;
+    height: 380px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+    padding: 10px 30px;
+    align-items: center;
+    margin-top: 30px;
+
+    .name {
+        padding-top: 10px;
+        font: bold normal normal 19px/22px Segoe UI;
+        padding-bottom: 10px;
+    }
+
+    .price {
+        color: red;
+        font: normal normal normal 17px/22px Segoe UI;
+        padding-bottom: 5px;
+    }
+
+    .brand {
+        display: flex;
+        padding-bottom: 5px;
+        align-items: center;
+
+        img {
+            width: 25px;
+            height: 25px;
+            padding-right: 10px;
+        }
+
+        .name {
+            font: normal normal normal 19px/22px Segoe UI;
+        }
+    }
+
+    .info {
+        display: flex;
+        align-items: center;
+
+        img {
+            width: 25px;
+            height: 25px;
+            padding-right: 10px;
+        }
+
+        .name {
+            font: normal normal normal 19px/22px Segoe UI;
+        }
+    }
+}

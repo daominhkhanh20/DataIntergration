@@ -1,0 +1,59 @@
+.product-detail {
+    display: flex;
+    flex-direction: column;
+    .back {
+        margin-top: 70px;
+    }
+    .info {
+        display: flex;
+        flex-direction: column;
+
+        .name {
+            display: flex;
+            font: bold normal normal 22px/29px Segoe UI;
+            color: #1565c0;
+            padding-top: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .detail {
+            padding-top: 20px;
+            display: flex;
+            padding-left: 10%;
+
+            img {
+                margin-left: 50px;
+                box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+                width: 300px;
+                height: 300px;
+            }
+
+            .basic-details {
+                display: flex;
+                flex-direction: column;
+                padding-left: 5%;
+                .basic-detail {
+                    display: flex;
+                    align-items: center;
+                    height: 20%;
+                    border-bottom: 1px solid rgba(224, 224, 224, 1);
+                    width: 880px;
+                    .key {
+                        font: bold normal normal 17px/21px Segoe UI;
+                        width: 100px;
+                    }
+                }
+            }
+        }
+    }
+    .store-details {
+        padding-top: 50px;
+        padding-left: 5%;
+        padding-right: 5%;
+        .text {
+            font: bold normal normal 17px/21px Segoe UI;
+            padding-bottom: 20px;
+        }
+    }
+}
