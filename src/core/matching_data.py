@@ -137,7 +137,7 @@ class MatchingData:
         df = self.df[index]
         df1 = self.df[index1]
         indexer = recordlinkage.Index()
-        indexer.block('Hãng sản xuất')
+        indexer.full()
         candidates = indexer.index(df, df1)
 
         compare = recordlinkage.Compare()
@@ -145,7 +145,7 @@ class MatchingData:
             'new_product_name': 0.8,
             'Ổ cứng': 0.8,
             'ram': 0.8,
-            'Bộ vi xử lý': 0.8
+            'Bộ vi xử lý': 0.9
         }
         for feature, threshold in list_keys.items():
             compare.string(feature, feature, threshold=threshold, label=feature)
