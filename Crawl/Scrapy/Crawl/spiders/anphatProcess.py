@@ -76,9 +76,22 @@ class AnPhat(Spider):
         dict_loader = {}
         iter = 0
         for id, item in data.iterrows():
-            if item[0] in dict_loader.keys():
-                iter  += 1
-                dict_loader[f'{item[0]}_{iter}'] = item[1]
+            if item[0] =='Dung lượng':
+                try:
+                    if type(item[1]) is str and item[1]!= '':
+                        if '256' in item[1] or '512' in item[1] or '1TB' in item[1] or '128' in item[1] or '2TB' in item[1] :
+                            dict_loader[f'Ổ cứng'] = item[1]
+                        else:
+                            dict_loader[f'Bộ nhớ trong'] = item[1]
+                except Exception as e:
+                    print(e)
+            elif item[0] =='RAM':
+                dict_loader[f'Bộ nhớ trong'] = item[1]
+            elif item[0] =='Công nghệ CPU':
+                dict_loader[f'Bộ vi xử lý'] = item[1]
+            # if item[0] in dict_loader.keys():
+            #     iter  += 1
+            #     dict_loader[f'{item[0]}_{iter}'] = item[1]
             else:
                 dict_loader[item[0]] = item[1]
 
