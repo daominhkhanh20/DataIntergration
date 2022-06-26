@@ -1,0 +1,110 @@
+.home {
+    display: flex;
+    flex-direction: column;
+
+    .home-content {
+        padding-top: 70px;
+        display: flex;
+        .search {
+            padding-bottom: 20px;
+            :nth-child(2) {
+                div {
+                    padding: 0;
+                }
+            }
+            .filters-text {
+                font: bold normal normal 17px/22px Segoe UI;
+                padding-bottom: 10px;
+            }
+            button {
+                min-width: 20px;
+                padding-right: 20px;
+                padding-left: 10px;
+                height: 40px;
+                color: black;
+            }
+        }
+
+        .filter-list {
+            width: 20%;
+            padding-left: 20px;
+            padding-top: 10px;
+            .brand-filters {
+                display: flex;
+                flex-direction: column;
+                .brands {
+                    display: flex;
+                    flex-direction: column;
+                    flex-wrap: wrap;
+                    height: 300px;
+                    width: 300px;
+                }
+                .filters-text {
+                    font: bold normal normal 17px/22px Segoe UI;
+                    padding-bottom: 10px;
+                }
+            }
+
+            .price-filters {
+                display: flex;
+                flex-direction: column;
+                .filters-text {
+                    font: bold normal normal 17px/22px Segoe UI;
+                    padding: 20px 0px 10px 0px;
+                }
+            }
+
+            .ram-filters {
+                display: flex;
+                flex-direction: column;
+                .rams {
+                    display: flex;
+                    flex-direction: column;
+                    flex-wrap: wrap;
+                    height: 200px;
+                    width: 300px;
+                }
+                .filters-text {
+                    font: bold normal normal 17px/22px Segoe UI;
+                    padding: 20px 0px 10px 0px;
+                }
+            }
+
+            .storage-filters {
+                display: flex;
+                flex-direction: column;
+                .storages {
+                    display: flex;
+                    flex-direction: column;
+                    flex-wrap: wrap;
+                    height: 200px;
+                    width: 300px;
+                }
+                .filters-text {
+                    font: bold normal normal 17px/22px Segoe UI;
+                    padding: 20px 0px 10px 0px;
+                }
+            }
+            .apply-button {
+                display: flex;
+                justify-content: center;
+                button {
+                    text-transform: none;
+                }
+                .gap {
+                    width: 20px;
+                }
+            }
+        }
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+    }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        padding: 20px 0;
+    }
+}

@@ -13,24 +13,24 @@ database = client['ProcessData']
 cellphones_collections = database['cellphones']
 
 
-def parser_cpu(sent):
-    if 'ghz' not in sent.lower():
-        return sent, None
-
-    words = sent.lower().split(" ")
-    speed_indexs = []
-    for idx, word in enumerate(words):
-        if 'ghz' in word:
-            speed_indexs.append(idx)
-
-    if re.match('(\d+?[.x,])+?\d+?$', words[speed_indexs[0] - 1]):
-        speed_indexs.insert(0, speed_indexs[0] - 1)
-
-    if speed_indexs[0] != 0:
-        return " ".join(words[: speed_indexs[0]]), " ".join(
-            [words[i] for i in range(speed_indexs[0], speed_indexs[-1] + 1, 1)])
-    return " ".join(words[speed_indexs[-1] + 1:]), " ".join(
-        [words[i] for i in range(speed_indexs[0], speed_indexs[-1] + 1, 1)])
+# def parser_cpu(sent):
+#     if 'ghz' not in sent.lower():
+#         return sent, None
+#
+#     words = sent.lower().split(" ")
+#     speed_indexs = []
+#     for idx, word in enumerate(words):
+#         if 'ghz' in word:
+#             speed_indexs.append(idx)
+#
+#     if re.match('(\d+?[.x,])+?\d+?$', words[speed_indexs[0] - 1]):
+#         speed_indexs.insert(0, speed_indexs[0] - 1)
+#
+#     if speed_indexs[0] != 0:
+#         return " ".join(words[: speed_indexs[0]]), " ".join(
+#             [words[i] for i in range(speed_indexs[0], speed_indexs[-1] + 1, 1)])
+#     return " ".join(words[speed_indexs[-1] + 1:]), " ".join(
+#         [words[i] for i in range(speed_indexs[0], speed_indexs[-1] + 1, 1)])
 
 
 def get_result(url, debug_mode: bool = False):
@@ -53,18 +53,14 @@ class CellPhoneS(Spider):
     list_phone_url = json.load(open('../Url/cellphones/final_phone.json', 'r'))
     list_laptop_url = json.load(open('../Url/cellphones/final_laptop.json', 'r'))
     key_map = {
-        'os': ['Hệ điều hành'],
+        'Hệ điều hành': ['Hệ điều hành'],
         'ram': ['Dung lượng RAM'],
-        'cpu': ['Loại CPU', 'Chipset'],
-        'cpu speed': None,
+        'Loại CPU': ['Loại CPU', 'Chipset'],
         'gpu': ['Loại card đồ họa'],
-        'screen': ['Tính năng màn hình', 'Công nghệ màn hình', 'Kích thước màn hình'],
-        'screen resolution': ['Độ phân giải màn hình'],
-        'storage': ['Ổ cứng', 'Bộ nhớ trong'],
-        'weight': ['Trọng lượng'],
-        'origin': None,
-        'brand': None,
-        'color': None,
+        'màn hình': ['Tính năng màn hình', 'Công nghệ màn hình', 'Kích thước màn hình'],
+        'Độ phân giải màn ': ['Độ phân giải màn hình'],
+        'Ổ cứng': ['Ổ cứng', 'Bộ nhớ trong'],
+        'Trọng lượng': ['Trọng lượng'],
         'pin': ['Pin']
     }
 
@@ -102,23 +98,28 @@ class CellPhoneS(Spider):
         }
         dict_parser = get_result(url=response.url)
 
+        list_keys = list(dict_parser.keys())
+        list_keys_added = []
         for attribute in self.key_map.keys():
             if self.key_map[attribute] is not None:
-                result = []
                 for name in self.key_map[attribute]:
-                    temp = dict_parser.get(name, None)
-                    if temp:
-                        result.append(temp)
-                if len(result) > 0:
-                    data[attribute] = " ".join(result).strip()
-                else:
-                    data[attribute] = None
-            else:
-                data[attribute] = None
+                    name_key = None
+                    for key in list_keys:
+                        if name.lower() in key.lower():
+                            name_key = key
+                    if name_key is None:
+                        continue
+                    temp = dict_parser.get(name_key, None)
+                    data[attribute] = temp
+                    list_keys_added.append(name_key)
+                    break
+        if len(data.keys()) == 5:
+            return None
 
-        cpu_name, cpu_spped = parser_cpu(data['cpu'])
-        data['cpu'] = cpu_name
-        data['cpu speed'] = cpu_spped
+        list_key_remains = list(set(list_keys) ^ set(list_keys_added))
+        for key in list_key_remains:
+            data[key] = dict_parser[key]
+
         cellphones_collections.insert_one(data)
 
     # def parse(self, response, **kwargs):

@@ -1,6 +1,8 @@
 # processing anphat
 cd Crawl/Scrapy
-scrapy crawl anphatprocess
+scrapy crawl anphatPd
+scrapy crawl hanoicmp
+
 
 # phucanh
 scrapy crawl phucanhprocess
