@@ -10,8 +10,8 @@ export default class Card extends Component {
         }
     }
 
-    componentDidMount() {
-
+    capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
     onHandleClick = () => {
@@ -22,7 +22,7 @@ export default class Card extends Component {
         return (
             <div className={"product-info-card"} onClick = {() => this.onHandleClick()}>
                 <div className="name">
-                    {this.props.item.name}
+                    {this.props.item.name.toUpperCase()}
                 </div>
                 <div className="price">
                     {this.props.item.price.toLocaleString('it-IT', {style : 'currency', currency : 'VND'})}
@@ -30,31 +30,31 @@ export default class Card extends Component {
                 <div className="info">
                     <img src = {Image.monitor} alt = ""/>
                     <div className="name">
-                        {this.props.item.brand}
+                        {this.props.item.brand.toUpperCase().replace('LAPTOP','')}
                     </div>
                 </div>
                 <div className="info">
                     <img src = {Image.CPU} alt = ""/>
                     <div className="name">
-                        {this.props.item.CPU}
+                        {this.capitalizeFirstLetter(this.props.item.CPU)}
                     </div>
                 </div>
                 <div className="info">
                     <img src = {Image.GPU} alt = ""/>
                     <div className="name">
-                        {this.props.item.GPU}
+                        {this.capitalizeFirstLetter(this.props.item.GPU)}
                     </div>
                 </div>
                 <div className="info">
                     <img src = {Image.RAM} alt = ""/>
                     <div className="name">
-                        {this.props.item.RAM}
+                        {this.capitalizeFirstLetter(this.props.item.RAM)}
                     </div>
                 </div>
                 <div className="info">
                     <img src = {Image.storage} alt = ""/>
                     <div className="name">
-                        {this.props.item.storage}
+                        {this.capitalizeFirstLetter(this.props.item.storage)}
                     </div>
                 </div>
                 <div className="info">

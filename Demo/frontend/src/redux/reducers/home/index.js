@@ -9,8 +9,8 @@ var initState = {
     selectedRAMFilter: [],
     storageFilters: [],
     selectedStorageFilter: [],
-    totalPage: 1,
-    currentPage: 1,
+    totalPage: 9,
+    currentPage: 0,
     searchString: "",
     items: []
 }

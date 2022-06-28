@@ -14,36 +14,32 @@ import SearchIcon from '@mui/icons-material/Search';
 import { connect } from 'react-redux';
 import * as action from '../../redux/action/index';
 import Api from '../../api/api';
+import LoadingScreen from '../../component/loading/index'
 
 class Home extends Component {
     constructor(props) {
         super(props);
-        this.state = {}
+        this.state = {
+            loading: true
+        }
     }
-    componentDidUpdate = (preProps) => {
+    componentDidUpdate = async (preProps) => {
         if (preProps.home.currentPage !== this.props.home.currentPage) {
             //call API de lay item moi
-            if(this.props.home.searchString) {
-                //call APi khi co string
-            }
-            if (
-                this.props.home.selectedBrandFilter.findIndex(() => true) !== -1 ||
-                this.props.home.selectedRAMFilter.findIndex(() => true) !== -1 ||
-                this.props.home.selectedStorageFilter.findIndex(() => true) !== -1
-            ) {
-                //call API khi co filter
-            }
+            this.setState({ loading: true })
+            const res = await Api.getItems(this.props.home.searchString, this.props.home.currentPage)
+            const items = this.mapAPIToState(res.data)
+            this.props.setStates({ items: items })
+            this.setState({ loading: false })
         }
     }
 
     componentDidMount = async () => {
+        this.setState({
+            loading: true
+        })
         //call api de lay filter
         const filters = await Api.getFilter()
-
-        //call api de lay item
-        const currentPage = 1
-        const pageSize = 10
-        const items = await Api.getItems(currentPage, this.props.home.searchString, pageSize)
 
         //set state redux
         const selectedFilter = {
@@ -52,8 +48,11 @@ class Home extends Component {
             selectedStorageFilter: filters.storageFilters.map(() => false),
         }
 
-        const data = { ...filters, ...items, ...selectedFilter }
+        const data = { ...filters, currentPage: 1, ...selectedFilter }
         this.props.setStates(data)
+        this.setState({
+            loading: false
+        })
     }
 
     checkBrandIsChecked(brand) {
@@ -107,10 +106,9 @@ class Home extends Component {
     }
     onApplyFilter = () => {
         //call api search
-
     }
 
-    onRemoveAllFilters = async() => {
+    onRemoveAllFilters = async () => {
         const newFilters = {
             selectedStorageFilter: this.props.home.selectedBrandFilter.map(() => false),
             selectedBrandFilter: this.props.home.selectedBrandFilter.map(() => false),
@@ -126,7 +124,7 @@ class Home extends Component {
         const items = await Api.getItems(currentPage, pageSize)
 
         //set state redux 
-        const data = {...newFilters, ...items}
+        const data = { ...newFilters, ...items }
         this.props.setStates(data)
     }
 
@@ -134,13 +132,16 @@ class Home extends Component {
         this.props.navigate(`/${item.id}`)
     }
 
-    onSearchItems = async() => {
+    onSearchItems = async () => {
         //call api search
-        const currentPage = 1
-        const pageSize = 10
-        const searchItems = await Api.getItems(currentPage, this.props.home.searchString, pageSize)
+        this.setState({ loading: true })
 
-        this.props.setStates(searchItems)
+        const currentPage = 1
+        const res = await Api.getItems(this.props.home.searchString, currentPage)
+        const items = this.mapAPIToState(res.data)
+        this.props.setStates({ items: items, currentPage: currentPage })
+
+        this.setState({ loading: false })
     }
 
     onSearchStringChange = (e) => {
@@ -154,9 +155,27 @@ class Home extends Component {
         }
     }
 
+    mapAPIToState = (items) => {
+        return items.map((item) => {
+            return {
+                id: item.id,
+                name: item.name,
+                price: Number(item.information[0].price),
+                brand: item.information.find((item) => item.brand !== "NaN")?.brand || "Unknown",
+                CPU: item.information.find((item) => item.cpu !== "NaN")?.cpu || "Unknown",
+                GPU: item.information.find((item) => item.vga !== "NaN")?.vga || "Unknown",
+                RAM: item.information.find((item) => item.rom !== "NaN")?.rom || "Unknown",
+                storage: item.information.find((item) => item.disk !== "NaN")?.disk || "Unknown",
+                shopNum: item.information.length
+            }
+        })
+
+    }
+
     render() {
         return (
             <div className="home">
+                <LoadingScreen open={this.state.loading} />
                 <Header />
                 <div className="home-content">
                     <div className="filter-list">

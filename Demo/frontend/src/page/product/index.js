@@ -11,46 +11,65 @@ import './index.scss'
 import { Button } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { withRouter } from '../../util/withRouter';
+import Api from '../../api/api';
+import LoadingScreen from '../../component/loading';
 class Product extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            name: "Laptop Acer TravelMate B3 TMB311 31 P49D N5030/4GB/256GB/Win11 (NX.VNFSV.005)  ",
-            imageUrl: "https://laptopworld.vn/media/product/9983_lenovo_thinkpad_e15_gen_2_4.jpg",
-            CPU: "PentiumN50301.1GHz",
-            RAM: 8,
-            storage: 256,
-            card: "Card tích hợp Intel UHD 605",
-            brand: "Acer ",
-            stores: [
-                {
-                    name: "tgdd",
-                    url: "https://www.thegioididong.com/laptop/acer-travelmate-b3-tmb311-31-p49d-n5030-nxvnfsv005?src=osp",
-                    price: 1000000000,
-                    OS: "Window 11",
-                    screen: '11.6"HD (1366 x 768)',
-                    battery: "57 Wh",
-                    weight: "2.3 kg",
-                    color: "Gray",
-                    material: "Gray"
-                },
-                {
-                    name: "tgdd1",
-                    url: "https://www.thegioididong.com/laptop/acer-travelmate-b3-tmb311-31-p49d-n5030-nxvnfsv005?src=osp",
-                    price: 1000000000,
-                    OS: "Window 11",
-                    screen: '11.6"HD (1366 x 768)',
-                    battery: "57 Wh",
-                    weight: "2.3 kg",
-                    color: "Gray",
-                    material: "Gray"
-                }
-            ]
+            name: "",
+            imageUrl: "",
+            CPU: "",
+            RAM: "",
+            storage: "",
+            GPU: "",
+            brand: " ",
+            stores: [],
+            loading: true
         }
     }
 
-    componentDidMount() {
+    mapAPIToState = (item) => {
+        return (
+            {
+                name: item.name,
+                brand: item.information.find((item) => item.brand !== "NaN").brand || "Unknown",
+                CPU: item.information.find((item) => item.cpu !== "NaN").cpu || "Unknown",
+                GPU: item.information.find((item) => item.vga !== "NaN").vga || "Unknown",
+                RAM: item.information.find((item) => item.rom !== "NaN").rom || "Unknown",
+                storage: item.information.find((item) => item.disk !== "NaN").disk || "Unknown",
+                imageUrl: item.information.find((item) => item.image_url !== "NaN").image_url || "Unknown",
+                stores: item.information.map((info) => ({
+                    name: info.web,
+                    url: info.product_url,
+                    price: Number(info.price),
+                    OS: info.os === "NaN" ? "Unknown" : this.capitalizeFirstLetter(info.os),
+                    screen: info.monitor === "NaN" ? "Unknown" : this.capitalizeFirstLetter(info.monitor),
+                    battery: info.pin === "NaN" ? "Unknown" : this.capitalizeFirstLetter(info.pin),
+                    color: info.color === "NaN" ? "Unknown" : this.capitalizeFirstLetter(info.color),
+                    dimension: info.dimension === "NaN" ? "Unknown" : this.capitalizeFirstLetter(info.dimension),
+                    weight: info.weight === "NaN" ? "Unknown" : this.capitalizeFirstLetter(info.weight),
+                }))
+            }
+        )
+    }
 
+    capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    componentDidMount = async () => {
+        const id = this.props.params.id
+        this.setState({
+            loading: true
+        })
+
+        const res = await Api.getItem(id)
+        const item = this.mapAPIToState(res.data)
+        this.setState({
+            ...item,
+            loading: false
+        })
     }
 
     onHandleClickBack() {
@@ -61,6 +80,7 @@ class Product extends Component {
         return (
             <div className='product-detail'>
                 <Header />
+                <LoadingScreen open={this.state.loading} />
                 <div className='back'>
                     <Button
                         startIcon={<ArrowBackIcon />}
@@ -71,30 +91,30 @@ class Product extends Component {
                 </div>
                 <div className='info'>
                     <div className='name'>
-                        <span>{this.state.name}</span>
+                        <span>{this.state.name.toUpperCase()}</span>
                     </div>
                     <div className='detail'>
                         <img src={this.state.imageUrl} alt="" />
                         <div className='basic-details'>
                             <div className='basic-detail'>
                                 <div className='key'>CPU:</div>
-                                <div className='value'>{this.state.CPU}</div>
+                                <div className='value'>{this.capitalizeFirstLetter(this.state.CPU)}</div>
                             </div>
                             <div className='basic-detail'>
                                 <div className='key'>RAM:</div>
-                                <div className='value'>{this.state.RAM} GB</div>
+                                <div className='value'>{this.capitalizeFirstLetter(this.state.RAM)}</div>
                             </div>
                             <div className='basic-detail'>
                                 <div className='key'>Storage:</div>
-                                <div className='value'>{this.state.storage} GB</div>
+                                <div className='value'>{this.capitalizeFirstLetter(this.state.storage)}</div>
                             </div>
                             <div className='basic-detail'>
                                 <div className='key'>Card:</div>
-                                <div className='value'>{this.state.card}</div>
+                                <div className='value'>{this.capitalizeFirstLetter(this.state.GPU)}</div>
                             </div>
                             <div className='basic-detail'>
                                 <div className='key'>Brand:</div>
-                                <div className='value'>{this.state.brand}</div>
+                                <div className='value'>{this.state.brand.toUpperCase()}</div>
                             </div>
                         </div>
                     </div>
@@ -115,17 +135,17 @@ class Product extends Component {
                                     <TableCell align="left">Battery</TableCell>
                                     <TableCell align="left">Weight</TableCell>
                                     <TableCell align="left">Color</TableCell>
-                                    <TableCell align="left">Material</TableCell>
+                                    <TableCell align="left">Dimension</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {this.state.stores.map((store) => (
                                     <TableRow
-                                        key={store.name}
+                                        key={store.url}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                     >
                                         <TableCell align='left'>
-                                            <a href={store.url}>
+                                            <a href={store.url} target="_blank" rel="noopener noreferrer">
                                                 {store.name}
                                             </a>
                                         </TableCell>
@@ -135,7 +155,7 @@ class Product extends Component {
                                         <TableCell align="left">{store.battery}</TableCell>
                                         <TableCell align="left">{store.weight}</TableCell>
                                         <TableCell align="left">{store.color}</TableCell>
-                                        <TableCell align="left">{store.material}</TableCell>
+                                        <TableCell align="left">{store.dimension}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
