@@ -12,143 +12,47 @@ import { withRouter } from '../../util/withRouter';
 import Header from '../../component/header';
 import SearchIcon from '@mui/icons-material/Search';
 import { connect } from 'react-redux';
-import * as action from '../../redux/action/index'
+import * as action from '../../redux/action/index';
+import Api from '../../api/api';
+import LoadingScreen from '../../component/loading/index'
 
 class Home extends Component {
     constructor(props) {
         super(props);
-        this.state = {}
+        this.state = {
+            loading: true
+        }
     }
-    componentDidUpdate = (preProps) => {
+    componentDidUpdate = async (preProps) => {
         if (preProps.home.currentPage !== this.props.home.currentPage) {
-            console.log("Next page")
             //call API de lay item moi
+            this.setState({ loading: true })
+            const res = await Api.getItems(this.props.home.searchString, this.props.home.currentPage)
+            const items = this.mapAPIToState(res.data)
+            this.props.setStates({ items: items })
+            this.setState({ loading: false })
         }
     }
 
     componentDidMount = async () => {
+        this.setState({
+            loading: true
+        })
         //call api de lay filter
-        const filters = await Promise.resolve({
-            brandFilters: ["Asus", "Lenovo", "Apple", "Asus", "Lenovo", "Apple", "Asus", "Lenovo", "Apple", "Asus", "Lenovo", "Apple"],
-            RAMFilters: ["2", "4", "8", "2", "4", "8"],
-            storageFilters: ["128", "256", "512", "128", "256", "512"],
-        })
-        //call api de lay item
-        const items = await Promise.resolve({
-            totalPage: 10,
-            currentPage: 1,
-            items: [
-                {
-                    id: 1,
-                    name: "Laptop HP Pavilion 15 eg0541TU i3 1125G4/4GB/512GB/Win11 (4P5G8PA) ",
-                    price: 100000,
-                    brand: "Asus",
-                    CPU: "i5-12000H",
-                    GPU: "Intel Iris Xe Graphics",
-                    RAM: 8,
-                    storage: 256,
-                    shopNum: 2
-                },
-                {
-                    id: 2,
-                    name: "Laptop HP Pavilion 15 eg0541TU i3 1125G4/4GB/512GB/Win11 (4P5G8PA) ",
-                    price: 100000,
-                    brand: "Asus",
-                    CPU: "i5-12000H",
-                    GPU: "Intel Iris Xe Graphics",
-                    RAM: 8,
-                    storage: 256,
-                    shopNum: 2
-                },
-                {
-                    id: 3,
-                    name: "Laptop HP Pavilion 15 eg0541TU i3 1125G4/4GB/512GB/Win11 (4P5G8PA) ",
-                    price: 100000,
-                    brand: "Asus",
-                    CPU: "i5-12000H",
-                    GPU: "Intel Iris Xe Graphics",
-                    RAM: 8,
-                    storage: 256,
-                    shopNum: 2
-                },
-                {
-                    id: 4,
-                    name: "Laptop HP Pavilion 15 eg0541TU i3 1125G4/4GB/512GB/Win11 (4P5G8PA) ",
-                    price: 100000,
-                    brand: "Asus",
-                    CPU: "i5-12000H",
-                    GPU: "Intel Iris Xe Graphics",
-                    RAM: 8,
-                    storage: 256,
-                    shopNum: 2
-                },
-                {
-                    id: 5,
-                    name: "Laptop HP Pavilion 15 eg0541TU i3 1125G4/4GB/512GB/Win11 (4P5G8PA) ",
-                    price: 100000,
-                    brand: "Asus",
-                    CPU: "i5-12000H",
-                    GPU: "Intel Iris Xe Graphics",
-                    RAM: 8,
-                    storage: 256,
-                    shopNum: 2
-                },
-                {
-                    id: 6,
-                    name: "Laptop HP Pavilion 15 eg0541TU i3 1125G4/4GB/512GB/Win11 (4P5G8PA) ",
-                    price: 100000,
-                    brand: "Asus",
-                    CPU: "i5-12000H",
-                    GPU: "Intel Iris Xe Graphics",
-                    RAM: 8,
-                    storage: 256,
-                    shopNum: 2
-                },
-                {
-                    id: 7,
-                    name: "Laptop HP Pavilion 15 eg0541TU i3 1125G4/4GB/512GB/Win11 (4P5G8PA) ",
-                    price: 100000,
-                    brand: "Asus",
-                    CPU: "i5-12000H",
-                    GPU: "Intel Iris Xe Graphics",
-                    RAM: 8,
-                    storage: 256,
-                    shopNum: 2
-                },
-                {
-                    id: 8,
-                    name: "Laptop HP Pavilion 15 eg0541TU i3 1125G4/4GB/512GB/Win11 (4P5G8PA) ",
-                    price: 100000,
-                    brand: "Asus",
-                    CPU: "i5-12000H",
-                    GPU: "Intel Iris Xe Graphics",
-                    RAM: 8,
-                    storage: 256,
-                    shopNum: 2
-                },
-                {
-                    id: 9,
-                    name: "Laptop HP Pavilion 15 eg0541TU i3 1125G4/4GB/512GB/Win11 (4P5G8PA) ",
-                    price: 100000,
-                    brand: "Asus",
-                    CPU: "i5-12000H",
-                    GPU: "Intel Iris Xe Graphics",
-                    RAM: 8,
-                    storage: 256,
-                    shopNum: 2
-                }
-            ]
-        })
+        const filters = await Api.getFilter()
 
+        //set state redux
         const selectedFilter = {
-            selectedBrandFilter: filters.brandFilters.map(() => false), 
+            selectedBrandFilter: filters.brandFilters.map(() => false),
             selectedRAMFilter: filters.RAMFilters.map(() => false),
             selectedStorageFilter: filters.storageFilters.map(() => false),
         }
 
-        const data = {...filters, ...items, ...selectedFilter}
-
+        const data = { ...filters, currentPage: 1, ...selectedFilter }
         this.props.setStates(data)
+        this.setState({
+            loading: false
+        })
     }
 
     checkBrandIsChecked(brand) {
@@ -162,7 +66,7 @@ class Home extends Component {
             }
             return item
         })
-        this.props.setStates({selectedBrandFilter: newSelectedBrandFilter})
+        this.props.setStates({ selectedBrandFilter: newSelectedBrandFilter })
     }
 
     onCheckRAMChange = (_e, selectedIndex) => {
@@ -172,7 +76,7 @@ class Home extends Component {
             }
             return item
         })
-        this.props.setStates({selectedRAMFilter: newSelectedRAMFilter})
+        this.props.setStates({ selectedRAMFilter: newSelectedRAMFilter })
     }
 
     onCheckStorageChange = (_e, selectedIndex) => {
@@ -182,74 +86,96 @@ class Home extends Component {
             }
             return item
         })
-        this.props.setStates({selectedStorageFilter: newSelectedStorageFilter})
+        this.props.setStates({ selectedStorageFilter: newSelectedStorageFilter })
     }
 
     onFromPriceChange = (e) => {
-        const checkPosNum = /^[0-9][0-9]*$/
+        const checkPosNum = /^[1-9][0-9]*$/
         const value = e.target.value
-        if (checkPosNum.test(value) || value === undefined) {
-            this.props.setStates({fromPrice: e.target.value}) 
+        if (checkPosNum.test(value) || value === "") {
+            this.props.setStates({ fromPrice: e.target.value })
         }
     }
 
     onToPriceChange = (e) => {
-        const checkPosNum = /^[0-9][0-9]*$/
+        const checkPosNum = /^[1-9][0-9]*$/
         const value = e.target.value
-        if (checkPosNum.test(value) || value === undefined) {
-            this.props.setStates({toPrice: e.target.value}) 
+        if (checkPosNum.test(value) || value === "") {
+            this.props.setStates({ toPrice: e.target.value })
         }
     }
     onApplyFilter = () => {
         //call api search
-
     }
 
-    onRemoveAllFilters = () => {
-        let newSelectedStorageFilter = this.state.selectedBrandFilter.map((_item) => false)
-        let newselectedBrandFilter = this.state.selectedBrandFilter.map((_item) => false)
-        let newselectedRAMFilter = this.state.selectedRAMFilter.map((_item) => false)
-        let newFromPrice = ""
-        let newToPrice = ""
-        let newSearchString = ""
+    onRemoveAllFilters = async () => {
+        const newFilters = {
+            selectedStorageFilter: this.props.home.selectedBrandFilter.map(() => false),
+            selectedBrandFilter: this.props.home.selectedBrandFilter.map(() => false),
+            selectedRAMFilter: this.props.home.selectedRAMFilter.map(() => false),
+            fromPrice: "",
+            toPrice: "",
+            searchString: "",
+        }
 
-        //call api to update new item
+        //call API to get item
+        const currentPage = 1
+        const pageSize = 10
+        const items = await Api.getItems(currentPage, pageSize)
 
-        this.setState({
-            selectedBrandFilter: newselectedBrandFilter,
-            selectedRAMFilter: newselectedRAMFilter,
-            selectedStorageFilter: newSelectedStorageFilter,
-            fromPrice: newFromPrice,
-            toPrice: newToPrice,
-            searchString: newSearchString
-        })
+        //set state redux 
+        const data = { ...newFilters, ...items }
+        this.props.setStates(data)
     }
 
     onHandleClickItem = (item) => {
         this.props.navigate(`/${item.id}`)
     }
 
-    onSearchItems = () => {
+    onSearchItems = async () => {
         //call api search
-        console.log(this.props.home)
+        this.setState({ loading: true })
+
+        const currentPage = 1
+        const res = await Api.getItems(this.props.home.searchString, currentPage)
+        const items = this.mapAPIToState(res.data)
+        this.props.setStates({ items: items, currentPage: currentPage })
+
+        this.setState({ loading: false })
     }
 
     onSearchStringChange = (e) => {
-        e.preventDefault()
-        if (e.key === 'Enter' || e.keyCode === 13) {
-            //call api wwhen press enter 
-            console.log("Test")
-            this.onSearchItems()
-            return 
-        }
         this.props.setStates({
             searchString: e.target.value
         })
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            //call api wwhen press enter 
+            this.onSearchItems()
+            return
+        }
+    }
+
+    mapAPIToState = (items) => {
+        return items.map((item) => {
+            return {
+                id: item.id,
+                name: item.name,
+                price: Number(item.information[0].price),
+                brand: item.information.find((item) => item.brand !== "NaN")?.brand || "Unknown",
+                CPU: item.information.find((item) => item.cpu !== "NaN")?.cpu || "Unknown",
+                GPU: item.information.find((item) => item.vga !== "NaN")?.vga || "Unknown",
+                RAM: item.information.find((item) => item.rom !== "NaN")?.rom || "Unknown",
+                storage: item.information.find((item) => item.disk !== "NaN")?.disk || "Unknown",
+                shopNum: item.information.length
+            }
+        })
+
     }
 
     render() {
         return (
             <div className="home">
+                <LoadingScreen open={this.state.loading} />
                 <Header />
                 <div className="home-content">
                     <div className="filter-list">
@@ -264,7 +190,7 @@ class Home extends Component {
                                 placeholder='Tìm kiếm sản phẩm'
                                 value={this.props.home.searchString}
                                 onChange={this.onSearchStringChange}
-                                onKeyDown= {this.onSearchStringChange}
+                                onKeyDown={this.onSearchStringChange}
                                 InputProps={{
                                     startAdornment: (
                                         <Button
@@ -339,7 +265,7 @@ class Home extends Component {
                                     return (
                                         <div className="ram-filter" key={index}>
                                             <FormControlLabel
-                                                label={ram + " GB"}
+                                                label={ram}
                                                 control={
                                                     <Checkbox
                                                         icon={<CircleUnchecked />}
@@ -365,7 +291,7 @@ class Home extends Component {
                                     return (
                                         <div className="storage-filter" key={index}>
                                             <FormControlLabel
-                                                label={storage + " GB"}
+                                                label={storage}
                                                 control={
                                                     <Checkbox
                                                         icon={<CircleUnchecked />}
