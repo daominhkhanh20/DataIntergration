@@ -33,4 +33,6 @@ public class ItemResponse {
     private String name;
 
     private List<Product> information;
+    
+    private int totalPage;
 }
