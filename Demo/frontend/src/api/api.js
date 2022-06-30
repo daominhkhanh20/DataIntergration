@@ -11,8 +11,8 @@ const Api = {
         return Promise.resolve({
         })
     },
-    getItems: (searchString ,currentPage) => {
-        return guest.get(`${baseUrl}/find?keyword=${searchString}&page=${currentPage}`)
+    getItems: (searchString ,currentPage, onlyGetMatchingData) => {
+        return onlyGetMatchingData ? guest.get(`${baseUrl}/all_matching?page=${currentPage}&keyword=${searchString}`) : guest.get(`${baseUrl}/find?keyword=${searchString}&page=${currentPage}`)
     },
     getItem: (Id) => {
         return guest.get(`${baseUrl}/show/item?id=${Id}`)

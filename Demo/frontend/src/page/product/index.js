@@ -33,12 +33,12 @@ class Product extends Component {
         return (
             {
                 name: item.name,
-                brand: item.information.find((item) => item.brand !== "NaN").brand || "Unknown",
-                CPU: item.information.find((item) => item.cpu !== "NaN").cpu || "Unknown",
-                GPU: item.information.find((item) => item.vga !== "NaN").vga || "Unknown",
-                RAM: item.information.find((item) => item.rom !== "NaN").rom || "Unknown",
-                storage: item.information.find((item) => item.disk !== "NaN").disk || "Unknown",
-                imageUrl: item.information.find((item) => item.image_url !== "NaN").image_url || "Unknown",
+                brand: item.information.find((item) => item.brand !== "NaN")?.brand || "Unknown",
+                CPU: item.information.find((item) => item.cpu !== "NaN")?.cpu || "Unknown",
+                GPU: item.information.find((item) => item.vga !== "NaN")?.vga || "Unknown",
+                RAM: item.information.find((item) => item.rom !== "NaN")?.rom || "Unknown",
+                storage: item.information.find((item) => item.disk !== "NaN")?.disk || "Unknown",
+                imageUrl: item.information.find((item) => item.image_url !== "NaN")?.image_url || "Unknown",
                 stores: item.information.map((info) => ({
                     name: info.web,
                     url: info.product_url,
