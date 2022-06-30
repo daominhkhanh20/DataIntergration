@@ -14,7 +14,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import { connect } from 'react-redux';
 import * as action from '../../redux/action/index';
 import Api from '../../api/api';
-import LoadingScreen from '../../component/loading/index'
+import LoadingScreen from '../../component/loading/index';
+import Switch from '@mui/material/Switch';
 
 class Home extends Component {
     constructor(props) {
@@ -24,13 +25,24 @@ class Home extends Component {
         }
     }
     componentDidUpdate = async (preProps) => {
-        if (preProps.home.currentPage !== this.props.home.currentPage) {
+        if (preProps.home.currentPage !== this.props.home.currentPage && preProps.home.onlyGetMatchingData === this.props.home.onlyGetMatchingData) {
             //call API de lay item moi
             this.setState({ loading: true })
-            const res = await Api.getItems(this.props.home.searchString, this.props.home.currentPage)
+            const res = await Api.getItems(this.props.home.searchString, this.props.home.currentPage, this.props.home.onlyGetMatchingData)
             const items = this.mapAPIToState(res.data)
-            this.props.setStates({ items: items })
+            this.props.setStates({ items: items, totalPage: res.data[0].totalPage })
             this.setState({ loading: false })
+            return
+        }
+        if (preProps.home.onlyGetMatchingData !== this.props.home.onlyGetMatchingData) {
+            //call API de lay item moi
+            this.setState({ loading: true })
+            const currentPage = 1
+            const res = await Api.getItems(this.props.home.searchString, currentPage, this.props.home.onlyGetMatchingData)
+            const items = this.mapAPIToState(res.data)
+            this.props.setStates({ items: items, totalPage: res.data[0].totalPage, currentPage: currentPage })
+            this.setState({ loading: false })
+            return 
         }
     }
 
@@ -41,6 +53,13 @@ class Home extends Component {
         //call api de lay filter
         const filters = await Api.getFilter()
 
+        //get item
+        if (this.props.home.items.length === 0) {
+            const res = await Api.getItems(this.props.home.searchString, this.props.home.currentPage, this.props.home.onlyGetMatchingData)
+            const items = this.mapAPIToState(res.data)
+            this.props.setStates({ items: items, totalPage: res.data[0].totalPage })
+        }
+
         //set state redux
         const selectedFilter = {
             selectedBrandFilter: filters.brandFilters.map(() => false),
@@ -48,7 +67,7 @@ class Home extends Component {
             selectedStorageFilter: filters.storageFilters.map(() => false),
         }
 
-        const data = { ...filters, currentPage: 1, ...selectedFilter }
+        const data = { ...filters, ...selectedFilter }
         this.props.setStates(data)
         this.setState({
             loading: false
@@ -119,12 +138,12 @@ class Home extends Component {
         }
 
         //call API to get item
-        const currentPage = 1
-        const pageSize = 10
-        const items = await Api.getItems(currentPage, pageSize)
+        // const currentPage = 1
+        // const pageSize = 10
+        // const items = await Api.getItems(currentPage, pageSize)
 
         //set state redux 
-        const data = { ...newFilters, ...items }
+        const data = { ...newFilters }
         this.props.setStates(data)
     }
 
@@ -137,9 +156,9 @@ class Home extends Component {
         this.setState({ loading: true })
 
         const currentPage = 1
-        const res = await Api.getItems(this.props.home.searchString, currentPage)
+        const res = await Api.getItems(this.props.home.searchString, currentPage, this.props.home.onlyGetMatchingData)
         const items = this.mapAPIToState(res.data)
-        this.props.setStates({ items: items, currentPage: currentPage })
+        this.props.setStates({ items: items, currentPage: currentPage, totalPage: res.data[0].totalPage })
 
         this.setState({ loading: false })
     }
@@ -149,7 +168,7 @@ class Home extends Component {
             searchString: e.target.value
         })
         if (e.key === 'Enter' || e.keyCode === 13) {
-            //call api wwhen press enter 
+            //call api when press enter 
             this.onSearchItems()
             return
         }
@@ -170,6 +189,12 @@ class Home extends Component {
             }
         })
 
+    }
+
+    handleSwitchChange = () => {
+        this.props.setStates({
+            onlyGetMatchingData: !this.props.home.onlyGetMatchingData
+        })
     }
 
     render() {
@@ -200,6 +225,18 @@ class Home extends Component {
                                     )
                                 }}
                             />
+                        </div>
+                        <div className="matching-filters">
+                            <div className="filters-text">
+                                Chỉ lấy sản phẩm trùng lặp: 
+                            </div>
+                            <div>
+                                <Switch
+                                    checked={this.props.home.onlyGetMatchingData}
+                                    onChange={this.handleSwitchChange}
+                                    inputProps={{ 'aria-label': 'controlled' }}
+                                />
+                            </div>
                         </div>
                         <div className="brand-filters">
                             <div className="filters-text">

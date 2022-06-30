@@ -10,9 +10,10 @@ var initState = {
     storageFilters: [],
     selectedStorageFilter: [],
     totalPage: 9,
-    currentPage: 0,
+    currentPage: 1,
     searchString: "",
-    items: []
+    items: [],
+    onlyGetMatchingData: true,
 }
 
 var homeReducer = (state = initState, action) => {

@@ -44,6 +44,15 @@
                     padding-bottom: 10px;
                 }
             }
+            .matching-filters {
+                display: flex;
+                align-items: center;
+                .filters-text {
+                    font: bold normal normal 17px/22px Segoe UI;
+                    padding-bottom: 10px;
+                    padding-right: 10px;
+                }
+            }
 
             .price-filters {
                 display: flex;
