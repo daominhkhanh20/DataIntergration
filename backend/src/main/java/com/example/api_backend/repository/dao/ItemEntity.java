@@ -21,7 +21,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
  *
  * @author 20183556
  */
-@Document("data_matching2")
+@Document("data_matching2v1")
 @Data
 @Getter
 @Setter
