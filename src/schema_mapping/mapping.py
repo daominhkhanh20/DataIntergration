@@ -65,6 +65,12 @@ def getPrice(txt):
 for col_name in colections_name:
     data[col_name]['price'] = data[col_name]['price'].apply(lambda txt: getPrice(txt))
 
+# get meta data
+list_defined = ['image_url','product_name','price','product_url']
+meta_data = {}
+for key in data:
+    meta_data[key] = data[key][list_defined]
+    data[key].drop(columns = list_defined,inplace = True)
 
 def married_matching(matches):
     ap_check = {}
@@ -105,13 +111,15 @@ for i in range(1,len(data)):
     data[colections_name[i]].rename(columns = match_all[i-1],inplace=True)
 
 # put data to database
-def put_data(data):
-    for id,item in data.iterrows():
-        data_collections.insert_one(item.to_dict())
+def put_data(data,key):
+    for item,meta in zip(data.iterrows(),meta_data[key].iterrows()):
+        value = item[1].to_dict()
+        value.update(meta[1].to_dict())
+        data_collections.insert_one(value)
 
 database = client['ProcessData']
 
-data_collections = database['schema_mapping']
+data_collections = database['schema_mapping1']
 
 max_col_match = 0
 for i in range(1,len(data)):
@@ -120,5 +128,5 @@ for i in range(1,len(data)):
         max_col_match = len(col_math)
         cols_1 = col_math
     print(f'Data: {i}',len(col_math))
-    put_data(data[colections_name[i]][col_math])
-put_data(data[colections_name[0]][cols_1])
+    put_data(data[colections_name[i]][col_math],colections_name[i])
+put_data(data[colections_name[0]][cols_1],colections_name[0])
