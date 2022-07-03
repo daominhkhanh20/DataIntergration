@@ -107,9 +107,9 @@ public class Controller {
         int totalPage;
         List<ItemEntity> tmp = itemRepo.findByKeyword(".*" + keyword + ".*");
         if (tmp.size() % 8 == 0) {
-            totalPage = tmp.size();
+            totalPage = tmp.size()/8;
         } else {
-            totalPage = tmp.size() + 1;
+            totalPage = tmp.size()/8 + 1;
         }
         List<ItemEntity> Listitem = tmp.stream().skip(8 * (page - 1)).limit(8).collect(Collectors.toList());
         List<ItemResponse> items = new ArrayList<>();
