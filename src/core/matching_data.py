@@ -145,7 +145,7 @@ class MatchingData:
         df = self.df[index]
         df1 = self.df[index1]
         list_key = ['new_product_name', 'Ổ cứng', 'ram', 'VGA', 'Bộ vi xử lý']
-        weight = [0.5, 0.125, 0.125, 0.125, 0.125]
+        weight = [0.6, 0.1, 0.1, 0.1, 0.1]
         jaccard_fn = Jaccard(k=2)
         normalized_levenshtein = NormalizedLevenshtein()
         cnt = 0
