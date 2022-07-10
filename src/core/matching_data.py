@@ -126,6 +126,7 @@ class MatchingData:
         for doc in source_collection.find():
             documents.append(doc)
         documents = pd.DataFrame(documents)
+        documents = documents.drop_duplicates(subset=['product_url'], keep='first', inplace=True).reset_index(drop=True)
         documents = process_df(documents)
         documents = documents[documents['Hãng sản xuất'].notna()].reset_index(drop=True)
         documents[['Hệ điều hành', 'web', 'Bộ vi xử lý', 'Hãng sản xuất', 'Pin', 'product_name', 'new_product_name',
